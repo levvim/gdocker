@@ -1,0 +1,89 @@
+id, 	 phi, 	 nChildren, 	 nGenes, 	 genes 
+0,	[ 1.],	1,	0,	
+1,	[ 1.],	2,	7,	s9; s3; s1; s0; s7; s6; s5
+2,	[ 0.25],	1,	1,	s2
+3,	[ 0.021],	0,	1,	s8
+4,	[ 0.686],	1,	1,	s10
+5,	[ 0.366],	0,	1,	s4
+
+
+
+      /2 /-3
+-0 /1|
+      \4 /-5
+
+Number of non-empty nodes in the tree: 5
+
+
+id, 	 phi, 	 nChildren, 	 nGenes, 	 genes 
+0,	[ 1.],	1,	0,	
+1,	[ 1.],	2,	7,	s9; s3; s1; s0; s7; s6; s5
+2,	[ 0.683],	2,	1,	s10
+3,	[ 0.365],	0,	1,	s4
+4,	[ 0.021],	0,	1,	s8
+5,	[ 0.256],	0,	1,	s2
+
+
+
+         /-3
+      /2|
+-0 /1|   \-4
+     |
+      \-5
+
+Number of non-empty nodes in the tree: 5
+
+
+id, 	 phi, 	 nChildren, 	 nGenes, 	 genes 
+0,	[ 1.],	1,	0,	
+1,	[ 1.],	2,	7,	s9; s3; s1; s0; s7; s6; s5
+2,	[ 0.684],	2,	1,	s10
+3,	[ 0.022],	0,	1,	s8
+4,	[ 0.371],	0,	1,	s4
+5,	[ 0.255],	0,	1,	s2
+
+
+
+         /-3
+      /2|
+-0 /1|   \-4
+     |
+      \-5
+
+Number of non-empty nodes in the tree: 5
+
+
+id, 	 phi, 	 nChildren, 	 nGenes, 	 genes 
+0,	[ 1.],	1,	0,	
+1,	[ 1.],	2,	7,	s9; s3; s1; s0; s7; s6; s5
+2,	[ 0.685],	1,	1,	s10
+3,	[ 0.366],	0,	1,	s4
+4,	[ 0.255],	1,	1,	s2
+5,	[ 0.023],	0,	1,	s8
+
+
+
+      /2 /-3
+-0 /1|
+      \4 /-5
+
+Number of non-empty nodes in the tree: 5
+
+
+id, 	 phi, 	 nChildren, 	 nGenes, 	 genes 
+0,	[ 1.],	1,	0,	
+1,	[ 1.],	2,	7,	s9; s3; s1; s0; s7; s6; s5
+2,	[ 0.254],	1,	1,	s2
+3,	[ 0.023],	0,	1,	s8
+4,	[ 0.685],	1,	1,	s10
+5,	[ 0.368],	0,	1,	s4
+
+
+
+      /2 /-3
+-0 /1|
+      \4 /-5
+
+Number of non-empty nodes in the tree: 5
+
+

@@ -1,0 +1,3 @@
+FROM thehyve/vcf2maf:v1.6.15_hyve
+
+ADD vepdata/ /vepdata

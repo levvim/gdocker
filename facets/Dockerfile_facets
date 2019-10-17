@@ -1,0 +1,62 @@
+FROM ubuntu:16.04
+MAINTAINER Levi Mangarin "markmangarin@gmail.com"
+
+################################################################################
+# Install all the necessary software
+################################################################################
+# Python, R, other dependencies
+## Basic image utilities
+### software-properties-common is for add-apt repository, coreutils for cut, open-ssh-client for scp
+RUN apt-get update \
+    && apt-get install -y --force-yes software-properties-common \
+    && echo "deb http://cran.rstudio.com/bin/linux/ubuntu xenial/" | tee -a /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get clean \
+    && apt-get install -qqy --allow-unauthenticated software-properties-common git wget curl openssh-client unzip vim gcc gawk sed coreutils sudo net-tools zlib1g-dev libncursesw5-dev libncurses5-dev maven g++ zlib1g-dev build-essential gcc python-setuptools python-dev python3-docutils python3-flask python3-pip python tabix libz-dev vcftools libcurl4-openssl-dev libssl-dev
+
+RUN apt-get update --fix-missing
+
+### Install CMake
+RUN sudo add-apt-repository ppa:george-edison55/cmake-3.x \
+    && sudo apt-get update \
+    && sudo apt-get install -qqy cmake
+
+################################################################################
+### Install R and dependencies for facets (libcurl)
+RUN cp /etc/apt/sources.list /etc/apt/sources.list~ && \
+    apt-key adv --keyserver keys.gnupg.net --recv-key 381BA480 && \
+    apt-get update && \
+    apt-get update && apt-get install -y --allow-unauthenticated r-base && \
+    apt-get -y build-dep libcurl4-gnutls-dev r-cran-devtools && \
+    apt-get -y install libcurl4-gnutls-dev
+
+### Install samtools
+RUN cd / && \
+    wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2 && \
+    bunzip2 samtools-1.9.tar.bz2 && \
+    tar -xvf samtools-1.9.tar && \
+    cd samtools-1.9 && \
+    make
+
+### Install snp-pileup
+ADD snp-pileup /snp-pileup
+
+### Install facets
+ADD run_facets.R /run_facets.R
+
+RUN R -e "install.packages('devtools', lib='~/R/lib')" \
+    && Rscript -e "library(devtools)" \
+    && Rscript -e "devtools::install_github('mskcc/pctGCdata')" \
+    && Rscript -e "devtools::install_github('mskcc/facets', build_vignettes = TRUE)"
+
+################################################################################
+# Configure the image
+################################################################################
+## Set environment variables
+ENV HOME /root
+ENV PATH=":${PATH}"
+
+################################################################################
+# List filetree before execution
+WORKDIR /home/user/
+RUN ls -alR | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/' > filetree_origin.txt

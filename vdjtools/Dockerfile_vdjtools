@@ -1,0 +1,53 @@
+FROM ubuntu:16.04
+MAINTAINER Levi Mangarin "markmangarin@gmail.com"
+
+################################################################################
+# Install all the necessary software
+################################################################################
+# Python, R, Java 8, other dependencies
+## Basic image utilities
+### software-properties-common is for add-apt repository, coreutils for cut, open-ssh-client for scp
+RUN apt-get update \
+    && apt-get install -y --force-yes software-properties-common \
+    && echo "deb http://cran.rstudio.com/bin/linux/ubuntu xenial/" | tee -a /etc/apt/sources.list \
+    && gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9 \
+    && gpg -a --export E084DAB9 | apt-key add - \
+    && add-apt-repository ppa:openjdk-r/ppa \
+    && apt-get update \
+    && apt-get clean \
+    && apt-get install -qqy --allow-unauthenticated software-properties-common git wget curl openssh-client unzip vim gcc gawk sed coreutils sudo net-tools r-base r-base-dev openjdk-8-jdk openjdk-7-jdk zlib1g-dev libncursesw5-dev libncurses5-dev maven g++ zlib1g-dev build-essential gcc python-setuptools python-dev python3-docutils python3-flask python3-pip python tabix libz-dev vcftools libcurl4-openssl-dev libssl-dev alien \
+    && easy_install pip \
+    && pip install numpy
+
+RUN apt-get update --fix-missing
+
+################################################################################
+
+### Install VDJtools
+ADD vdjtools-1.2.1/ /vdjtools-1.2.1 
+
+### Install bcl2fastq v2.20
+RUN cd /tmp/ && \
+    wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-0-linux-x86-64.zip && \
+    unzip bcl2fastq2-v2-20-0-linux-x86-64.zip && \
+    alien -i bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && \
+    rm -f bcl2fastq2-v2-20-0-linux-x86-64.zip bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm 
+
+# install packages for r plotting
+RUN apt-get install -qqy --allow-unauthenticated r-cran-ape r-cran-ggplot2 r-cran-gplots r-cran-mass \
+    r-cran-plotrix r-cran-rcolorbrewer r-cran-reshape r-cran-reshape2 r-cran-scales \
+    && R -e "install.packages(c('circlize', 'grid', 'gridExtra', 'VennDiagram')) " 
+
+################################################################################
+# Configure the image
+
+## Set environment variables
+ENV HOME /root
+ENV WORK_DIR /PROJECT/
+ENV PATH="/vdjtools-1.2.1:${PATH}"
+ENV CLASSPATH=":$CLASSPATH"
+
+################################################################################
+
+WORKDIR /
+RUN ls -alR | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/' > filetree_origin.txt

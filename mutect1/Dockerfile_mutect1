@@ -1,0 +1,66 @@
+FROM ubuntu:16.04
+MAINTAINER Levi Mangarin "markmangarin@gmail.com"
+
+################################################################################
+# Install all the necessary software
+################################################################################
+# Python, R, Java 8, other dependencies
+## Basic image utilities
+### software-properties-common is for add-apt repository, coreutils for cut, open-ssh-client for scp
+RUN apt-get update \
+    && apt-get install -y --force-yes software-properties-common \
+    && echo "deb http://cran.rstudio.com/bin/linux/ubuntu xenial/" | tee -a /etc/apt/sources.list \
+    && gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9 \
+    && gpg -a --export E084DAB9 | apt-key add - \
+    && add-apt-repository ppa:openjdk-r/ppa \
+    && apt-get update \
+    && apt-get clean \
+    && apt-get install -qqy software-properties-common git wget curl openssh-client unzip vim gcc gawk sed coreutils sudo net-tools r-base r-base-dev openjdk-8-jdk openjdk-7-jdk zlib1g-dev libncursesw5-dev libncurses5-dev maven g++ zlib1g-dev build-essential gcc python-setuptools python-dev python3-docutils python3-flask python3-pip python tabix libz-dev vcftools libcurl4-openssl-dev libssl-dev \
+    && easy_install pip \
+    && pip install numpy
+
+RUN apt-get update --fix-missing
+
+### Install Snakemake
+RUN apt-get -qq update \
+    && easy_install3 snakemake
+
+### Install CMake
+RUN sudo add-apt-repository ppa:george-edison55/cmake-3.x \
+    && sudo apt-get update \
+    && sudo apt-get install -qqy cmake
+
+################################################################################
+### Install GATK
+RUN cd / \
+    && git clone https://github.com/broadgsa/gatk-protected.git \
+    && cd /gatk-protected \
+    && mvn -version \
+    && mvn clean verify -P\!queue \
+    && mvn -Ddisable.queue install
+    #&& git reset --hard 3.1 \
+
+### Install samtools
+RUN cd / && \
+    wget https://github.com/samtools/samtools/releases/download/1.3.1/samtools-1.3.1.tar.bz2 && \
+    bunzip2 samtools-1.3.1.tar.bz2 && \
+    tar -xvf samtools-1.3.1.tar && \
+    cd samtools-1.3.1 && \
+    make
+
+### Install muTect
+ADD mutect-1.1.7.jar /mutect-1.1.7.jar
+
+################################################################################
+# Configure the image
+
+## Set environment variables
+ENV HOME /root
+ENV WORK_DIR /PROJECT/
+ENV PATH="/samtools-1.3.1:${PATH}"
+ENV CLASSPATH="/muTect-1.1.7.jar:/gatk-protected/target/GenomeAnalysisTK.jar:$CLASSPATH"
+
+################################################################################
+# List filetree before execution
+WORKDIR /
+RUN ls -alR | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/' > filetree_origin.txt

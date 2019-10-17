@@ -1,0 +1,28 @@
+FROM ubuntu:16.04
+MAINTAINER Levi Mangarin "markmangarin@gmail.com"
+
+################################################################################
+# Install all the necessary software
+################################################################################
+RUN apt-get update -y && apt-get install -y \
+    git \
+    build-essential \
+    openjdk-8-jre \
+    wget \
+    unzip
+
+################################################################################
+### Install mixcr
+
+ENV version 3.0.9
+WORKDIR /mixcr/
+
+RUN wget https://github.com/milaboratory/mixcr/releases/download/v${version}/mixcr-${version}.zip
+
+RUN unzip mixcr-${version}.zip
+
+################################################################################
+# Configure the image
+
+# add mixcr executable to path
+ENV PATH="/mixcr/mixcr-${version}/:${PATH}"
